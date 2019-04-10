@@ -1,16 +1,16 @@
 <?php
-namespace SMD\Models;
+namespace SMD;
 /**
- * Interface ModelInterface
+ * Class NetworkException
  *
- * Базовый интерфейс для всех моделей
+ * Исключение выбрасываемое при ошибках SMD API
  *
- * @package SMD\Models
+ * @package SMD
  * @link https://github.com/probel/smd
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-interface ModelInterface
+class NetworkException extends Exception
 {
 }

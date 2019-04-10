@@ -6,8 +6,7 @@ namespace SMD\Request;
  * Класс для хранения аргументов
  *
  * @package SMD\Request
- * @author dotzero <mail@dotzero.ru>
- * @link https://github.com/
+ * @link https://github.com/probel/smd
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -31,6 +30,14 @@ class ParamsBag
      */
     private $proxy = null;
     /**
+     * @var boolean Флаг PATCH запроса
+     */
+    private $patch = false;
+    /**
+     * @var boolean Флаг DELETE запроса
+     */
+    private $delete = false;
+    /**
      * Добавление прокси сервера
      *
      * @param string $proxy Прокси сервер для отправки запроса
@@ -41,6 +48,64 @@ class ParamsBag
     {
         $this->proxy = $proxy;
         return $this;
+    }
+    /**
+     * Добавление флага PATCH
+     *
+     * @return $this
+     */
+    public function setPatch()
+    {
+        $this->patch = true;
+        return $this;
+    }
+    /**
+     * Удаление флага PATCH
+     *
+     * @return $this
+     */
+    public function clearPatch()
+    {
+        $this->patch = false;
+        return $this;
+    }
+    /**
+     * Проверяет флаг PATCH
+     *
+     * @return boolean флаг PATCH
+     */
+    public function hasPatch()
+    {
+        return $this->patch;
+    }
+    /**
+     * Добавление флага DELETE
+     *
+     * @return $this
+     */
+    public function setDelete()
+    {
+        $this->delete = true;
+        return $this;
+    }
+    /**
+     * Удаление флага DELETE
+     *
+     * @return $this
+     */
+    public function clearDelete()
+    {
+        $this->delete = false;
+        return $this;
+    }
+    /**
+     * Проверяет флаг DELETE
+     *
+     * @return boolean флаг DELETE
+     */
+    public function hasDelete()
+    {
+        return $this->delete;
     }
     /**
      * Добавление значений параметров для авторизации

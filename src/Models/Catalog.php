@@ -6,7 +6,7 @@ namespace SMD\Models;
  * Класс модель для работы с Каталогам
  *
  * @package SMD\Models
- * @link https://github.com/
+ * @link https://github.com/probel/smd
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,108 +14,133 @@ namespace SMD\Models;
 class Catalog extends AbstractModel
 {
     /**
-     * @var array Список доступный полей для модели (исключая кастомные поля)
-     */
-    /* protected $fields = [
-        'name',
-        'request_id',
-    ]; */
-    /**
-     * Список каталогов
+     * Список разделов
      *
-     * Метод для получения всех категорий.
+     * Метод для получения всех разделов.
      *
      * @link http://docs.api.smartdeal.practicalse.com/?ruby#get-all-sections-list
+     * @param array $parameters параметры для запроса
      * 
      * @return array Ответ SMD API
      */
-    public function sectionsAll()
+    public function sections($parameters = [])
     {
-        $parameters = [];
         $response = $this->getRequest('/catalog/sections/all.json', $parameters);
-        return isset($response['catalogs']) ? $response['catalogs'] : [];
+        return is_array($response) ? $response : [];
     }
     /**
-     * Добавление каталогов
+     * Список каталогов
      *
-     * Метод позволяет добавлять каталоги по одному или пакетно
+     * Метод для получения информации о разделе.
      *
-     * @link https://developers.SMD.ru/rest_api/catalogs/set.php
-     * @param array $catalogs Массив каталогов для пакетного добавления
-     * @return int|array Уникальный идентификатор каталога или массив при пакетном добавлении
+     * @link http://docs.api.smartdeal.practicalse.com/?ruby#information-about-section
+     * @param int $id Уникальный id раздела
+     * 
+     * @return array Ответ SMD API
      */
-    public function apiAdd($catalogs = [])
+    public function section($id)
     {
-        if (empty($catalogs)) {
-            $catalogs = [$this];
-        }
-        $parameters = [
-            'catalogs' => [
-                'add' => [],
-            ],
-        ];
-        foreach ($catalogs AS $catalog) {
-            $parameters['catalogs']['add'][] = $catalog->getValues();
-        }
-        $response = $this->postRequest('/private/api/v2/json/catalogs/set', $parameters);
-        if (isset($response['catalogs']['add']['catalogs'])) {
-            $result = array_map(function ($item) {
-                return $item['id'];
-            }, $response['catalogs']['add']['catalogs']);
-        } else {
-            return [];
-        }
-        return count($catalogs) == 1 ? array_shift($result) : $result;
+        $response = $this->getRequest("/catalog/sections/$id.json");
+        return is_array($response) ? $response : [];
     }
     /**
-     * Обновление каталогов
+     * Список каталогов
      *
-     * Метод позволяет обновлять данные по уже существующим каталогам
+     * Метод для получения списка параметров для раздела каталога.
      *
-     * @link https://developers.SMD.ru/rest_api/catalogs/set.php
-     * @param int $id Уникальный идентификатор каталога
-     * @return bool Флаг успешности выполнения запроса
-     * @throws \SMD\Exception
+     * @link http://docs.api.smartdeal.practicalse.com/?ruby#list-of-params-of-the-catalog-section
+     * @param int $id Уникальный id раздела
+     * 
+     * @return array Ответ SMD API
      */
-    public function apiUpdate($id)
+    public function sectionProps($id)
     {
-        $this->checkId($id);
-        $parameters = [
-            'catalogs' => [
-                'update' => [],
-            ],
-        ];
-        $catalog = $this->getValues();
-        $catalog['id'] = $id;
-        $parameters['catalogs']['update'][] = $catalog;
-        $response = $this->postRequest('/private/api/v2/json/catalogs/set', $parameters);
-        if (!isset($response['catalogs']['update']['errors'])) {
-            return false;
-        }
-        return empty($response['catalogs']['update']['errors']);
+        $response = $this->getRequest("/catalog/sections/$id/props.json");
+        return is_array($response) ? $response : [];
     }
+
     /**
-     * Удаление каталогов
+     * Продукт
      *
-     * Метод позволяет удалять данные по уже существующим каталогам
+     * Метод для получения продукта по Id.
      *
-     * @link https://developers.SMD.ru/rest_api/catalogs/set.php
-     * @param int $id Уникальный идентификатор каталога
-     * @return bool Флаг успешности выполнения запроса
-     * @throws \SMD\Exception
+     * @link http://docs.api.smartdeal.practicalse.com/?http#get-product-by-id
+     * @param int $id Уникальный id продукта
+     * 
+     * @return array Ответ SMD API
      */
-    public function apiDelete($id)
+    public function product($id)
     {
         $this->checkId($id);
-        $parameters = [
-            'catalogs' => [
-                'delete' => [$id],
-            ],
-        ];
-        $response = $this->postRequest('/private/api/v2/json/catalogs/set', $parameters);
-        if (!isset($response['catalogs']['delete']['errors'])) {
-            return false;
-        }
-        return empty($response['catalogs']['delete']['errors']);
+        $response = $this->getRequest("/catalog/products/$id.json", $parameters);
+        return $response;
     }
+
+    /**
+     * Аналоги продукта
+     *
+     * Метод для получения списка аналогов продукта.
+     *
+     * @link http://docs.api.smartdeal.practicalse.com/?http#get-analogs-of-product
+     * @param int $id Уникальный id продукта
+     * @param array $parameters параметры для запроса
+     * 
+     * @return array Ответ SMD API
+     */
+    public function analogs($id, $parameters = [])
+    {
+        $response = $this->getRequest("/catalog/products/$id/analogs.json", $parameters);
+        return is_array($response) ? $response : [];
+    }
+    
+    /**
+     * Список продуктов
+     *
+     * Метод для получения списка продуктов.
+     *
+     * @link http://docs.api.smartdeal.practicalse.com/?ruby#get-products-list
+     * @param array $parameters параметры для запроса
+     * 
+     * @return array Ответ SMD API
+     */
+    public function products($parameters = [])
+    {
+        $response = $this->getRequest("/catalog/products.json", $parameters);
+        return [
+            'items' => is_array($response) ? $response : [],
+            'total' => $this->getTotal(),
+        ];
+    }
+    /**
+     * Количество продуктов в каталоге
+     *
+     * Метод для получения количества продуктов в каталоге.
+     *
+     * @link http://docs.api.smartdeal.practicalse.com/?http#get-products-list-count
+     * @param array $parameters параметры для запроса
+     * 
+     * @return int|null Ответ SMD API
+     */
+    public function counters($parameters = [])
+    {
+        $response = $this->getRequest("/catalog/products/counters.json", $parameters);
+        return is_numeric($response) ? $response : null;
+    }
+
+    /**
+     * Количество продуктов
+     *
+     * Метод для получения количества продуктов из заголовка.
+     *
+     * @return int|null
+     */
+    private function getTotal()
+    {
+        $total = null;
+        preg_match("/X-Counters-Total: ([0-9]{1,}?).*$/Umi",$this->getLastHttpHeaders(),$matches);
+        if (isset($matches[1])) {
+            $total = $matches[1];
+        }
+        return $total;
+    }       
 }
